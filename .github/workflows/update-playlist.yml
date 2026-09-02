@@ -1,0 +1,45 @@
+name: Update Playlist Timestamps
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  process-playlist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests google-genai
+
+      - name: Process playlist
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TRANSCRIPT_API_KEY: ${{ secrets.TRANSCRIPT_API_KEY }}
+          PLAYLIST_URL: ${{ vars.PLAYLIST_URL }}
+        run: |
+          cd scripts
+          python process_playlist.py "$PLAYLIST_URL" --out-dir ../web/data
+
+      - name: Build timestamp map
+        run: |
+          cd mock-extractor
+          python build_mock_map.py --data-dir ../web/data --out ../web/data/mock-timestamp-map.json
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add web/data/
+          git diff --staged --quiet || git commit -m "Auto-update: process new playlist videos"
+          git push

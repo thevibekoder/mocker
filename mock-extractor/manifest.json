@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Mock Extractor",
+  "version": "1.14.0",
+  "description": "Manually save mock test questions from Testbook, Parmar Academy, RBE, and Parmar-style 'multiple' MCQ platforms into one shared pool that persists across mocks, export as a single HTML file, auto-attach a matching YouTube solution timestamp synced from a hosted map, and post them to a Telegram group as either auto-graded quiz polls or revotable practice polls with a spoiler-tagged rich-text answer reveal.",
+  "permissions": ["storage", "activeTab", "downloads", "scripting", "tabs", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Mock Extractor"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

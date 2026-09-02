@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mock Preview</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']],
+             displayMath: [['$$','$$'], ['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    :root { --primary:#2563eb; --green:#16a34a; --bg:#fff; --fg:#111; --muted:#6b7280; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:16px/1.6 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+           color:var(--fg); background:var(--bg); }
+    header {
+      position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #e5e7eb;
+      display:flex; align-items:center; gap:10px; padding:12px 24px; flex-wrap:wrap;
+    }
+    header .titlebox { flex:1; min-width: 240px; }
+    header h1 { font-size:13px; margin:0 0 4px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.05em;}
+    header input.title-input {
+      width:100%; font-size:20px; font-weight:700; border:1px solid transparent;
+      padding:6px 8px; border-radius:5px; background:transparent; color:var(--fg);
+      font-family:inherit;
+    }
+    header input.title-input:hover { border-color:#e5e7eb; background:#fafafa; }
+    header input.title-input:focus { outline:none; border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+    header .meta { color:var(--muted); font-size:12px; padding:0 8px; }
+    header button { padding:8px 16px; border:none; border-radius:5px; cursor:pointer;
+                    font-size:14px; font-weight:600; font-family:inherit; }
+    .btn-save  { background:var(--green); color:#fff; }
+    .btn-save:hover { background:#15803d; }
+    .btn-save:disabled { background:#9ca3af; cursor:not-allowed; }
+    .btn-tg { background:#229ed9; color:#fff; }
+    .btn-tg:hover { background:#1c86ba; }
+    .btn-all-a { background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe !important; }
+    .btn-all-s { background:#f0fdf4; color:var(--green); border:1px solid #bbf7d0 !important; }
+    .btn-dup   { background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5 !important; }
+    .btn-dup:hover { background:#fee2e2; }
+    .sort-select { padding:8px 12px; border:1px solid #d1d5db; border-radius:5px;
+                   background:#fff; color:#111; font-size:14px; font-weight:600;
+                   cursor:pointer; font-family:inherit; }
+    .sort-select:focus { outline:2px solid var(--primary); outline-offset:1px; }
+    .btn-del {
+      margin-left:auto; background:transparent; border:1px solid #fca5a5;
+      color:#b91c1c; border-radius:50%; width:26px; height:26px;
+      font-size:16px; line-height:1; cursor:pointer; font-family:inherit;
+      padding:0; display:inline-flex; align-items:center; justify-content:center;
+    }
+    .btn-del:hover { background:#fef2f2; }
+    main { max-width:880px; margin: 0 auto; padding: 20px 24px 80px; }
+    .status { padding:40px 24px; color:var(--muted); text-align:center; font-size:15px; }
+    .status.err { color:#b91c1c; }
+
+    .q { padding:20px 0; border-bottom:1px dashed #e5e7eb; }
+    .q:last-child { border-bottom:none; }
+    .qhead { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+    .qnum { font-weight:700; color:var(--primary); font-size:15px; }
+    .qmeta { display:flex; gap:6px; flex-wrap:wrap; }
+    .chip { display:inline-block; padding:2px 9px; border-radius:10px; font-size:12px;
+            background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe; font-weight:500; }
+    .chip-avg { background:#f3f4f6; color:#4b5563; border-color:#e5e7eb; }
+    .qbody { margin: 0 0 14px; }
+    .qbody img, .sol img { max-width:100%; height:auto; }
+    ol.opts { list-style:none; padding:0; margin: 0 0 14px; }
+    ol.opts li { padding:8px 12px; margin:6px 0; border:1px solid #e5e7eb; border-radius:6px;
+                 display:flex; gap:10px; align-items:flex-start; background:#fff; }
+    ol.opts li .letter { font-weight:700; color:#555; min-width:18px; }
+    ol.opts li .opt-html p { margin:0; }
+    .q.reveal-ans ol.opts li[data-correct="1"] { background:#dcfce7; border-color:#86efac; }
+    .q.reveal-ans ol.opts li[data-correct="1"] .letter { color: var(--green); }
+    .btns { display:flex; gap:8px; margin: 6px 0 4px; flex-wrap:wrap; }
+    .btns button { padding:6px 12px; border:1px solid #d1d5db; background:#f9fafb;
+                   border-radius:5px; cursor:pointer; font-size:13px; font-weight:500; font-family:inherit; }
+    .btns button:hover { background:#f3f4f6; }
+    .hidden { display:none !important; }
+    .ans { padding:10px 14px; background:#dbeafe; border-left:3px solid var(--primary);
+           margin: 8px 0; border-radius:4px; }
+    .sol { padding:12px 14px; background:#f9fafb; border-left:3px solid var(--green);
+           margin: 8px 0; border-radius:4px; }
+    .sol > strong { display:block; color:var(--green); margin-bottom:6px; }
+    .sol-body p { margin: 0 0 6px; }
+    .sol-body ul, .sol-body ol { margin: 6px 0 6px 22px; padding:0; }
+    .sol-video { margin: 4px 0 12px; }
+    .sol-video iframe { width:100%; aspect-ratio:16/9; border-radius:6px; display:block; }
+    .sol-video-caption { font-size:11px; color:#6b7280; margin-top:4px; }
+    .q .qbody .bg-red-100, .q .qbody .bg-green-100,
+    ol.opts li .bg-red-100, ol.opts li .bg-green-100 { background: transparent !important; }
+    @media print {
+      header { position: static; }
+      .btns, .btn-save, .btn-tg, .btn-all-a, .btn-all-s, .title-input { display:none !important; }
+      .hidden { display:block !important; }
+      .q { page-break-inside: avoid; }
+    }
+
+    /* ---- Telegram modal / progress ---- */
+    .tg-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:1000;
+                  display:flex; align-items:center; justify-content:center; padding:20px; }
+    .tg-box { background:#fff; border-radius:12px; padding:24px; width:100%; max-width:480px;
+              max-height:85vh; overflow:auto; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+    .tg-box h2 { margin:0 0 12px; font-size:18px; }
+    .tg-box p { margin:0 0 12px; color:var(--fg); font-size:14px; line-height:1.5; }
+    .tg-steps { margin:0 0 14px; padding-left:20px; font-size:13px; color:var(--muted); line-height:1.6; }
+    .tg-label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:10px 0 4px; }
+    .tg-input { width:100%; padding:9px 10px; border:1px solid #d1d5db; border-radius:6px;
+                font-size:14px; font-family:inherit; box-sizing:border-box; }
+    .tg-input:focus { outline:2px solid #229ed9; outline-offset:1px; border-color:#229ed9; }
+    .tg-err { color:#b91c1c; font-size:12px; min-height:16px; margin-top:4px; }
+    .tg-note { font-size:12px; color:var(--muted); margin:10px 0; line-height:1.5; }
+    .tg-note code { background:#f3f4f6; padding:2px 6px; border-radius:4px; }
+    .tg-note a { color:#229ed9; }
+    .tg-warn { color:#b45309; font-size:13px; font-weight:600; margin:6px 0 4px; }
+    .tg-skip-list { margin:0 0 10px; padding-left:20px; font-size:13px; color:#92400e; max-height:120px; overflow:auto; }
+    .tg-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+    .tg-actions button { padding:9px 16px; border:1px solid #d1d5db; background:#f9fafb;
+                          border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; font-family:inherit; }
+    .tg-progress-track { background:#e5e7eb; border-radius:6px; height:10px; overflow:hidden; margin-bottom:10px; }
+    .tg-progress-fill { background:#229ed9; height:100%; width:0%; transition:width .2s; }
+    .tg-progress-line { font-size:13px; color:var(--muted); margin-bottom:8px; }
+    .tg-log { max-height:160px; overflow:auto; font-size:12px; color:var(--muted); }
+    .tg-log-err { color:#b91c1c; }
+    .tg-log-warn { color:#b45309; }
+    .tg-mode-box { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .tg-mode-opt { display:flex; align-items:flex-start; gap:8px; padding:10px 12px;
+                   border:1px solid #e5e7eb; border-radius:8px; cursor:pointer; font-size:13px; }
+    .tg-mode-opt:hover { background:#f9fafb; }
+    .tg-mode-opt input { margin-top:3px; }
+    .tg-mode-opt strong { display:inline; }
+    .tg-summary { margin-bottom:4px; }
+  </style>
+</head>
+<body>
+  <div id="status" class="status">Loading captured questions&hellip;</div>
+  <script src="preview.js"></script>
+</body>
+</html>

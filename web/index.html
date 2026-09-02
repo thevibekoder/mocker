@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Review — Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14171F;
+    --surface: #1D212C;
+    --surface-2: #262B38;
+    --line: #333850;
+    --text: #ECEAE4;
+    --muted: #8B90A6;
+    --amber: #E3A54B;
+    --amber-dim: #6b5530;
+    --done: #5FA88A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  header h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header .meta{
+    color:var(--muted);
+    font-size:14px;
+  }
+  .progress-track{
+    height:4px;
+    background:var(--surface-2);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:32px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--amber);
+    width:0%;
+    transition:width .35s ease;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:240px 280px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width: 1080px){
+    .layout{grid-template-columns:220px 1fr;}
+    .videolist{ grid-column: 1 / -1; max-height:180px; }
+  }
+  @media (max-width: 700px){
+    .layout{grid-template-columns:1fr;}
+    .videolist{ max-height:220px; }
+  }
+
+  .videolist{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px;
+    max-height:calc(100vh - 200px);
+    overflow-y:auto;
+  }
+  .videolist .vheading{
+    font-size:12px;
+    color:var(--muted);
+    padding:8px 10px 4px;
+  }
+  .videolist button{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    padding:9px 10px;
+    border-radius:7px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    line-height:1.3;
+  }
+  .videolist button:hover{ background:var(--surface-2); color:var(--text); }
+  .videolist button.active{ background:var(--surface-2); color:var(--text); box-shadow: inset 2px 0 0 var(--amber); }
+  .videolist .vcount{ display:block; font-size:11px; color:var(--muted); margin-top:2px; }
+
+  .qlist{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px;
+    max-height:calc(100vh - 200px);
+    overflow-y:auto;
+  }
+  .qlist button{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:none;
+    color:var(--text);
+    padding:11px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    line-height:1.35;
+  }
+  .qlist button:hover{ background:var(--surface-2); }
+  .qlist button.active{ background:var(--surface-2); box-shadow: inset 2px 0 0 var(--amber); }
+  .qnum{
+    flex:0 0 26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .qlist button.active .qnum{ border-color:var(--amber); color:var(--amber); }
+  .qlist button.watched .qnum{ background:var(--done); border-color:var(--done); color:#0e1712; }
+  .qlabel{ color:var(--muted); }
+  .qlist button.active .qlabel{ color:var(--text); }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:28px;
+    min-height:420px;
+  }
+  .panel .eyebrow{
+    color:var(--amber);
+    font-size:13px;
+    margin-bottom:6px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:24px;
+    line-height:1.3;
+    margin:0 0 20px;
+    max-width:56ch;
+  }
+
+  .solve-btn{
+    appearance:none;
+    border:1px solid var(--amber);
+    background:transparent;
+    color:var(--amber);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:11px 20px;
+    border-radius:7px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .solve-btn:hover{ background:var(--amber); color:#1a1305; }
+  .solve-btn svg{ width:14px; height:14px; }
+
+  .video-shell{
+    margin-top:22px;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:#000;
+    display:none;
+  }
+  .video-shell.show{ display:block; }
+  .video-ratio{
+    position:relative;
+    width:100%;
+    padding-top:56.25%;
+  }
+  .video-ratio iframe{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:0;
+  }
+  .video-caption{
+    padding:10px 14px;
+    font-size:12.5px;
+    color:var(--muted);
+    border-top:1px solid var(--line);
+  }
+
+  .footer-note{
+    margin-top:40px;
+    color:var(--muted);
+    font-size:12.5px;
+    max-width:60ch;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Shift Review — Question Bank</h1>
+    <div class="meta" id="metaText">25 questions · click any to open its video solution at the right moment</div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="layout">
+    <nav class="videolist" id="videolist">
+      <div class="vheading">Playlist</div>
+    </nav>
+
+    <nav class="qlist" id="qlist"></nav>
+
+    <section class="panel">
+      <div class="eyebrow" id="qEyebrow">Question —</div>
+      <h2 id="qLabel">Select a question from the list</h2>
+      <button class="solve-btn" id="solveBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Show solution
+      </button>
+
+      <div class="video-shell" id="videoShell">
+        <div class="video-ratio" id="videoRatio"></div>
+        <div class="video-caption" id="videoCaption"></div>
+      </div>
+    </section>
+  </div>
+
+  <p class="footer-note">
+    Timestamps are generated automatically from the transcript. Solutions play directly from the
+    original video, cued to the moment this question begins — no re-uploading or clipping involved.
+  </p>
+</div>
+
+<script>
+  // Data comes from data/index.json (list of videos) + data/questions_<id>.json (per video).
+  // Both files are produced automatically by scripts/process_playlist.py.
+
+  let PLAYLIST_INDEX = { videos: [] };
+  let QUESTION_DATA = null;
+  const watchedByVideo = {}; // { video_id: Set(idx) }
+  let currentVideoId = null;
+  let current = null;
+
+  function fmtTime(totalSeconds){
+    const m = Math.floor(totalSeconds/60);
+    const s = Math.floor(totalSeconds%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function nextStart(idx){
+    const list = QUESTION_DATA.questions;
+    return idx+1 < list.length ? list[idx+1].start_seconds : null;
+  }
+
+  // ---- Video list (playlist) ----
+
+  async function loadPlaylistIndex(){
+    const res = await fetch('data/index.json');
+    PLAYLIST_INDEX = await res.json();
+    renderVideoList();
+    if (PLAYLIST_INDEX.videos.length){
+      selectVideo(PLAYLIST_INDEX.videos[0].video_id);
+    }
+  }
+
+  function renderVideoList(){
+    const el = document.getElementById('videolist');
+    el.innerHTML = '<div class="vheading">Playlist</div>';
+    PLAYLIST_INDEX.videos.forEach(v => {
+      const btn = document.createElement('button');
+      btn.dataset.vid = v.video_id;
+      btn.innerHTML = `${v.title || v.video_id}<span class="vcount">${v.question_count ?? '?'} questions</span>`;
+      btn.addEventListener('click', () => selectVideo(v.video_id));
+      el.appendChild(btn);
+    });
+  }
+
+  async function selectVideo(videoId){
+    currentVideoId = videoId;
+    document.querySelectorAll('.videolist button').forEach(b =>
+      b.classList.toggle('active', b.dataset.vid === videoId));
+
+    const res = await fetch(`data/questions_${videoId}.json`);
+    QUESTION_DATA = await res.json();
+
+    if (!watchedByVideo[videoId]) watchedByVideo[videoId] = new Set();
+
+    renderQuestionList();
+    updateProgress();
+    selectQuestion(0);
+  }
+
+  // ---- Question list (within selected video) ----
+
+  function renderQuestionList(){
+    const el = document.getElementById('qlist');
+    el.innerHTML = '';
+    QUESTION_DATA.questions.forEach((q, idx) => {
+      const btn = document.createElement('button');
+      btn.dataset.idx = idx;
+      if (watchedByVideo[currentVideoId].has(idx)) btn.classList.add('watched');
+      btn.innerHTML = `<span class="qnum">${q.number}</span><span class="qlabel">${q.label}</span>`;
+      btn.addEventListener('click', () => selectQuestion(idx));
+      el.appendChild(btn);
+    });
+  }
+
+  function updateProgress(){
+    const total = QUESTION_DATA.questions.length;
+    const watched = watchedByVideo[currentVideoId].size;
+    const pct = total ? Math.round((watched/total)*100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('metaText').textContent =
+      `${total} questions · ${watched} solutions viewed`;
+  }
+
+  function selectQuestion(idx){
+    current = idx;
+    const q = QUESTION_DATA.questions[idx];
+
+    document.querySelectorAll('.qlist button').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector(`.qlist button[data-idx="${idx}"]`);
+    if (btn) btn.classList.add('active');
+
+    document.getElementById('qEyebrow').textContent = `Question ${q.number} of ${QUESTION_DATA.questions.length}`;
+    document.getElementById('qLabel').textContent = q.label;
+
+    document.getElementById('videoShell').classList.remove('show');
+    document.getElementById('videoRatio').innerHTML = '';
+    document.getElementById('solveBtn').style.display = 'inline-flex';
+  }
+
+  function showSolution(){
+    if (current === null) return;
+    const q = QUESTION_DATA.questions[current];
+    const end = nextStart(current);
+
+    let src = `https://www.youtube.com/embed/${currentVideoId}?start=${q.start_seconds}&autoplay=1&rel=0`;
+    if (end) src += `&end=${end}`;
+
+    document.getElementById('videoRatio').innerHTML =
+      `<iframe src="${src}" title="Solution video" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    document.getElementById('videoShell').classList.add('show');
+    document.getElementById('videoCaption').textContent =
+      `Playing from ${fmtTime(q.start_seconds)}` + (end ? ` to ${fmtTime(end)}` : '');
+
+    watchedByVideo[currentVideoId].add(current);
+    const btn = document.querySelector(`.qlist button[data-idx="${current}"]`);
+    if (btn) btn.classList.add('watched');
+    updateProgress();
+  }
+
+  document.getElementById('solveBtn').addEventListener('click', showSolution);
+
+  loadPlaylistIndex();
+</script>
+
+</body>
+</html>
